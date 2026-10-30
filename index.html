@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101522">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Mi cuenta atrás</title>
+<style>
+:root{--accent:#f5c451;--ink:#fff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#101522;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+#backdrop{position:fixed;inset:0;z-index:-2;background:linear-gradient(130deg,#101522,#26364d);background-position:center;background-size:cover}
+.shade{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,#0007,#000a)}
+main{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 42px;text-align:center}
+h1{font-size:clamp(1.6rem,6vw,3rem);margin:0 0 8px;text-shadow:0 2px 12px #000}
+#subtitle{margin:0 0 28px;color:#eee}
+.timer{display:grid;grid-template-columns:repeat(4,minmax(65px,1fr));gap:clamp(8px,2vw,18px);width:min(780px,100%)}
+.unit{padding:clamp(12px,3vw,24px) 6px;border:1px solid #ffffff55;background:#10152299;border-radius:18px;backdrop-filter:blur(8px)}
+.num{display:block;font-size:clamp(2rem,9vw,5rem);font-weight:750;line-height:1.1;color:var(--accent);font-variant-numeric:tabular-nums}
+.unit small{display:block;margin-top:8px;text-transform:uppercase;letter-spacing:.1em;font-size:.68rem;color:#eee}
+#finished{display:none;font-size:clamp(1.5rem,5vw,2.5rem);font-weight:750;margin:24px}
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:25px}
+button,.filelabel{border:0;border-radius:999px;padding:12px 17px;background:var(--accent);color:#1b1b1b;font-weight:700;font-size:.93rem;cursor:pointer}
+button.secondary,.filelabel.secondary{background:#ffffffdf;color:#172033}
+.panel{display:none;width:min(640px,100%);margin:22px auto 0;padding:20px;text-align:left;border-radius:18px;background:#101522f2;border:1px solid #ffffff44}
+.panel.open{display:block}
+label{display:block;margin:12px 0 6px;font-size:.9rem;color:#eee}
+input[type=text],input[type=datetime-local],input[type=color],select{width:100%;padding:12px;border:1px solid #ffffff55;border-radius:10px;background:#fff;color:#172033;font:inherit}
+input[type=file]{display:none}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:.78rem;color:#d7dce6;line-height:1.5}#status{min-height:1.3em;font-size:.85rem;color:#eee;margin-top:12px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+.small-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.small-actions button{padding:9px 13px;font-size:.82rem}
+@media(max-width:420px){.timer{grid-template-columns:repeat(2,1fr);max-width:330px}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="backdrop"></div><div class="shade"></div><canvas id="confetti"></canvas>
+<main>
+<h1 id="title">Mi gran momento</h1><p id="subtitle">Cada segundo cuenta</p>
+<section class="timer" id="timer" aria-label="Cuenta atrás">
+ <div class="unit"><span class="num" id="days">000</span><small>Días</small></div>
+ <div class="unit"><span class="num" id="hours">00</span><small>Horas</small></div>
+ <div class="unit"><span class="num" id="minutes">00</span><small>Minutos</small></div>
+ <div class="unit"><span class="num" id="seconds">00</span><small>Segundos</small></div>
+</section>
+<div id="finished">¡Ha llegado el momento!</div>
+<div class="actions">
+ <button id="settingsBtn">Mis cuentas atrás</button>
+ <button class="secondary" id="soundBtn">Probar audio</button>
+ <button class="secondary" id="fullscreenBtn">Pantalla completa</button>
+</div>
+<section class="panel" id="panel">
+ <h2 style="margin:0 0 8px">Tus acontecimientos</h2>
+ <label for="eventSelect">Seleccionar cuenta atrás</label><select id="eventSelect"></select>
+ <div class="small-actions">
+  <button id="newBtn">+ Nueva</button><button class="secondary" id="deleteBtn">Eliminar seleccionada</button>
+ </div>
+ <hr style="border-color:#ffffff33;margin:18px 0">
+ <h3 style="margin:0">Personalizar acontecimiento</h3>
+ <label for="eventTitle">Título</label><input id="eventTitle" type="text" maxlength="60" placeholder="Por ejemplo: ¡Vacaciones!">
+ <label for="eventSubtitle">Texto secundario</label><input id="eventSubtitle" type="text" maxlength="90" placeholder="Ya queda menos...">
+ <label for="target">Fecha y hora</label><input id="target" type="datetime-local">
+ <div class="row">
+  <div><label for="accent">Color de los números</label><input id="accent" type="color" value="#f5c451"></div>
+  <div><label for="bgFile">Imagen de fondo</label><label class="filelabel secondary" for="bgFile">Elegir imagen</label><input id="bgFile" type="file" accept="image/*"></div>
+ </div>
+ <label for="audioFile">Tu música o sonido</label><label class="filelabel secondary" for="audioFile">Elegir audio</label><input id="audioFile" type="file" accept="audio/*">
+ <p class="hint">Las imágenes y los audios se guardan en el almacenamiento local de esta aplicación en el navegador de tu móvil. No se suben a ningún servidor. Si borras los datos del sitio o desinstalas la app, puedes perderlos.</p>
+ <div class="actions" style="justify-content:flex-start;margin-top:18px">
+  <button id="saveBtn">Guardar acontecimiento</button><button class="secondary" id="closeBtn">Cerrar</button>
+ </div>
+ <div id="status" role="status"></div>
+</section>
+</main>
+<audio id="alarm" preload="auto"></audio>
+<script>
+const $=id=>document.getElementById(id);
+const DB_NAME='mi-cuenta-atras-db', STORE='events';
+let db, events=[], activeId=null, activeImageUrl=null, activeAudioUrl=null, draftImage=null, draftAudio=null, lastSecond=-1, fireworksUntil=0, particles=[];
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>req.result.createObjectStore(STORE,{keyPath:'id'});req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+function allEvents(){return new Promise((resolve,reject)=>{const r=db.transaction(STORE).objectStore(STORE).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+function putEvent(ev){return new Promise((resolve,reject)=>{const r=db.transaction(STORE,'readwrite').objectStore(STORE).put(ev);r.onsuccess=resolve;r.onerror=()=>reject(r.error)})}
+function removeEvent(id){return new Promise((resolve,reject)=>{const r=db.transaction(STORE,'readwrite').objectStore(STORE).delete(id);r.onsuccess=resolve;r.onerror=()=>reject(r.error)})}
+function freshEvent(){return {id:crypto.randomUUID(),title:'Mi gran momento',subtitle:'Cada segundo cuenta',target:new Date(Date.now()+86400000).toISOString(),accent:'#f5c451',image:null,audio:null,played:false}}
+function setAssetUrls(ev){if(activeImageUrl)URL.revokeObjectURL(activeImageUrl);if(activeAudioUrl)URL.revokeObjectURL(activeAudioUrl);activeImageUrl=ev.image?URL.createObjectURL(ev.image):null;activeAudioUrl=ev.audio?URL.createObjectURL(ev.audio):null;$('backdrop').style.backgroundImage=activeImageUrl?`url("${activeImageUrl}")`:'linear-gradient(130deg,#101522,#26364d)';$('alarm').src=activeAudioUrl||''}
+function renderSelect(){const s=$('eventSelect');s.innerHTML='';events.forEach(e=>{const o=document.createElement('option');o.value=e.id;o.textContent=e.title||'Sin título';s.append(o)});s.value=activeId||''}
+function loadForm(ev){activeId=ev.id;$('eventTitle').value=ev.title;$('eventSubtitle').value=ev.subtitle;$('target').value=ev.target.slice(0,16);$('accent').value=ev.accent;draftImage=ev.image;draftAudio=ev.audio;renderSelect();applyEvent(ev)}
+function applyEvent(ev){$('title').textContent=ev.title||'Mi gran momento';$('subtitle').textContent=ev.subtitle||'Cada segundo cuenta';document.documentElement.style.setProperty('--accent',ev.accent||'#f5c451');setAssetUrls(ev);lastSecond=-1}
+function current(){return events.find(e=>e.id===activeId)}
+async function refresh(){events=await allEvents();if(!events.length){const e=freshEvent();await putEvent(e);events=[e]}if(!events.some(e=>e.id===activeId))activeId=events[0].id;loadForm(current())}
+function update(){
+ const ev=current();if(!ev)return;const diff=new Date(ev.target).getTime()-Date.now();
+ if(diff<=0){$('days').textContent='000';$('hours').textContent='00';$('minutes').textContent='00';$('seconds').textContent='00';$('timer').style.display='none';$('finished').style.display='block';
+  if(!ev.played){ev.played=true;putEvent(ev);if(activeAudioUrl)$('alarm').play().catch(()=>{});launchFireworks()}
+  return}
+ $('timer').style.display='grid';$('finished').style.display='none';
+ const d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000),s=Math.floor(diff%60000/1000);
+ $('days').textContent=String(d).padStart(3,'0');$('hours').textContent=String(h).padStart(2,'0');$('minutes').textContent=String(m).padStart(2,'0');$('seconds').textContent=String(s).padStart(2,'0');
+ if(s!==lastSecond){lastSecond=s;if(diff<=10000&&diff>0){}}
+}
+$('settingsBtn').onclick=()=>$('panel').classList.toggle('open');$('closeBtn').onclick=()=>$('panel').classList.remove('open');
+$('fullscreenBtn').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};
+$('eventSelect').onchange=()=>{activeId=$('eventSelect').value;loadForm(current())};
+$('newBtn').onclick=async()=>{const e=freshEvent();await putEvent(e);events.push(e);loadForm(e);$('status').textContent='Nueva cuenta atrás creada.'};
+$('deleteBtn').onclick=async()=>{if(events.length<=1){$('status').textContent='Debe quedar al menos una cuenta atrás.';return}await removeEvent(activeId);activeId=null;await refresh();$('status').textContent='Cuenta atrás eliminada.'};
+$('bgFile').onchange=e=>{draftImage=e.target.files[0]||draftImage;$('status').textContent='Imagen seleccionada; pulsa Guardar acontecimiento.'};
+$('audioFile').onchange=e=>{draftAudio=e.target.files[0]||draftAudio;$('status').textContent='Audio seleccionado; pulsa Guardar acontecimiento.'};
+$('saveBtn').onclick=async()=>{
+ const raw=$('target').value,parsed=raw?new Date(raw).getTime():NaN;if(!Number.isFinite(parsed)){ $('status').textContent='Elige una fecha y hora válidas.';return}
+ const ev=current()||freshEvent();ev.title=$('eventTitle').value.trim()||'Mi gran momento';ev.subtitle=$('eventSubtitle').value.trim()||'Cada segundo cuenta';ev.target=new Date(parsed).toISOString();ev.accent=$('accent').value;ev.image=draftImage||null;ev.audio=draftAudio||null;ev.played=parsed<=Date.now()?false:ev.played;
+ await putEvent(ev);events=await allEvents();activeId=ev.id;loadForm(ev);$('status').textContent='¡Guardado! Tus cambios y archivos quedan almacenados en este dispositivo.';update()
+};
+$('soundBtn').onclick=()=>{if(!$('alarm').src){$('status').textContent='Esta cuenta atrás no tiene audio seleccionado.';$('panel').classList.add('open');return}$('alarm').currentTime=0;$('alarm').play().catch(()=>$('status').textContent='Toca de nuevo para permitir la reproducción de audio.')};
+function launchFireworks(){fireworksUntil=Date.now()+6500;for(let i=0;i<7;i++)setTimeout(()=>burst(Math.random()*innerWidth,Math.random()*innerHeight*.55),i*550);animateFireworks()}
+function burst(x,y){for(let i=0;i<65;i++){const a=Math.random()*Math.PI*2,sp=1.5+Math.random()*5;particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:50+Math.random()*25,max:75,size:2+Math.random()*3})}}
+function animateFireworks(){const c=$('confetti'),ctx=c.getContext('2d');c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.clearRect(0,0,innerWidth,innerHeight);particles=particles.filter(p=>p.life>0);for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.045;p.vx*=.99;p.life--;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=`hsl(${(p.life*7+p.x)%360},95%,65%)`;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;if(Date.now()<fireworksUntil||particles.length){requestAnimationFrame(animateFireworks)}else ctx.clearRect(0,0,c.width,c.height)}
+(async()=>{try{db=await openDB();await refresh();update();setInterval(update,250)}catch(e){$('status').textContent='No se pudo activar el almacenamiento local en este navegador.'}})();
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>

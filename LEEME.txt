@@ -1,0 +1,17 @@
+MI CUENTA ATRÁS PERSONAL — VERSIÓN 2
+
+Novedades:
+- Puedes crear varias cuentas atrás y cambiar entre ellas.
+- Cada acontecimiento tiene su propio título, fecha, color, imagen y audio.
+- Las imágenes y los audios elegidos se guardan localmente en IndexedDB.
+- Al llegar a cero muestra un mensaje, lanza fuegos artificiales y reproduce el audio si el navegador permite la reproducción.
+
+Instalación en Android:
+1. Publica todos los archivos de esta carpeta en un alojamiento HTTPS.
+2. Abre la dirección en Chrome para Android.
+3. Menú ⋮ > Instalar aplicación o Añadir a pantalla de inicio.
+
+Importante:
+- Es una PWA instalable, no un APK nativo.
+- El sonido no se puede garantizar si Android suspende la aplicación o el navegador está cerrado. Para una alarma fiable con la app cerrada haría falta una versión nativa Android con permisos y programación de notificaciones.
+- Los datos se guardan en el navegador del dispositivo. Si borras los datos del sitio o desinstalas/limpias el navegador, podrías perderlos.
